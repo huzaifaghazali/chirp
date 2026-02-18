@@ -320,3 +320,21 @@ h6 {
     -webkit-box-orient: vertical;
     overflow: hidden;
 }
+
+/* Pagination specific styles */
+.pagination {
+    @apply flex items-center gap-1;
+}
+
+.pagination .btn {
+    @apply min-w-[2.5rem];
+}
+
+.pagination .btn-primary {
+    @apply pointer-events-none;
+}
+
+/* Ensure disabled buttons don't block clicks */
+.btn-disabled {
+    @apply opacity-50 cursor-not-allowed;
+}

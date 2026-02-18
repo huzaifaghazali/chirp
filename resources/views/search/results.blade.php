@@ -17,6 +17,7 @@
                                 placeholder="Search users or chirps..." class="input input-bordered w-full"
                                 autocomplete="off" autofocus />
                         </div>
+                        <input type="hidden" name="filter" value="{{ $filter }}">
                         <button type="submit" class="btn btn-primary">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
                                 stroke="currentColor">
@@ -38,7 +39,7 @@
                         </a>
                         <a href="{{ route('search', ['q' => $query, 'filter' => 'chirps']) }}"
                             class="btn btn-sm {{ $filter === 'chirps' ? 'btn-primary' : 'btn-ghost' }}">
-                            Chirps ({{ $chirps->count() }})
+                            Chirps ({{ $chirps->total() ?? 0 }})
                         </a>
                     </div>
                 </form>
@@ -51,7 +52,12 @@
                 @if (isset($message))
                     <p>{{ $message }}</p>
                 @else
-                    <p>Found {{ $totalResults }} result{{ $totalResults !== 1 ? 's' : '' }} for "{{ $query }}"
+                    <p>
+                        Found {{ $totalResults }} result{{ $totalResults !== 1 ? 's' : '' }}
+                        for "{{ $query }}"
+                        @if ($filter === 'chirps' && $chirps instanceof \Illuminate\Pagination\LengthAwarePaginator)
+                            (showing {{ $chirps->firstItem() }}-{{ $chirps->lastItem() }})
+                        @endif
                     </p>
                 @endif
             </div>
@@ -105,6 +111,13 @@
                         <x-chirp :chirp="$chirp" />
                     @endforeach
                 </div>
+
+                {{-- Pagination for Chirps --}}
+                @if ($chirps instanceof \Illuminate\Pagination\LengthAwarePaginator && $chirps->hasPages())
+                    <div class="mt-6">
+                        {{ $chirps->links() }}
+                    </div>
+                @endif
             </div>
         @endif
 
