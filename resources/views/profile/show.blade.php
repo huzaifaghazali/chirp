@@ -41,6 +41,12 @@
                             <span class="text-base-content/60">Chirps</span>
                         </div>
                         <div>
+                            <a href="{{ route('profile.likes', $user) }}" class="hover:underline">
+                                <span class="font-semibold">{{ $user->likedChirps()->count() }}</span>
+                                <span class="text-base-content/60">Likes</span>
+                            </a>
+                        </div>
+                        <div>
                             <span class="font-semibold">{{ $user->created_at->format('M Y') }}</span>
                             <span class="text-base-content/60">Joined</span>
                         </div>

@@ -20,6 +20,7 @@ Route::middleware('auth')->group(function () {
 
 // PROFILE ROUTES
 Route::get('/profile/{user}', [ProfileController::class, 'show'])->name('profile.show');
+Route::get('/profile/{user}/likes', [ProfileController::class, 'likes'])->name('profile.likes');
 Route::middleware('auth')->group(function () {
     Route::get('/profile/{user}/edit', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::put('/profile/{user}', [ProfileController::class, 'update'])->name('profile.update');
