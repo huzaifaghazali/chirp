@@ -18,7 +18,12 @@ class ProfileController extends Controller
     public function show(User $user)
     {
         $chirps = $user->chirps()->latest()->paginate(10);
-
+        $chirps = $user->chirps()
+            ->with(['user', 'likes'])
+            ->withCount('likes')
+            ->latest()
+            ->paginate(10);
+            
         return view('profile.show', [
             'user' => $user,
             'chirps' => $chirps,

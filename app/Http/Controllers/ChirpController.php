@@ -15,7 +15,7 @@ class ChirpController extends Controller
     public function index()
     {
         // $chirps = Chirp::with('user')->latest()->take(50)->get();
-        $chirps = Chirp::with('user')->latest()->paginate(5);
+        $chirps = Chirp::with(['user', 'likes'])->withCount('likes')->latest()->paginate(5);
         return view('home', ['chirps' => $chirps]);
     }
 
@@ -71,8 +71,8 @@ class ChirpController extends Controller
      */
     public function update(Request $request, Chirp $chirp)
     {
-         // This is security check. Check that the currently logged-in user has permission to perform updated
-         $this->authorize('update', $chirp);
+        // This is security check. Check that the currently logged-in user has permission to perform updated
+        $this->authorize('update', $chirp);
         // Validate
         $validated = $request->validate([
             'message' => 'required|string|max:255',
@@ -89,7 +89,7 @@ class ChirpController extends Controller
      */
     public function destroy(Chirp $chirp)
     {
-         // This is security check. Check that the currently logged-in user has permission to perform deleting
+        // This is security check. Check that the currently logged-in user has permission to perform deleting
         $this->authorize('delete', $chirp);
         $chirp->delete();
         return redirect('/')->with('success', 'Chirp deleted');

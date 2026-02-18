@@ -4,6 +4,7 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -51,8 +52,17 @@ class User extends Authenticatable
         ];
     }
 
-    public function chirps(): HasMany {
+    public function chirps(): HasMany
+    {
         return $this->hasMany(Chirp::class);
+    }
+
+    /**
+     * Chirps liked by this user
+     */
+    public function likedChirps(): BelongsToMany
+    {
+        return $this->belongsToMany(Chirp::class, 'chirp_user_likes')->withTimestamps();
     }
 
     /**
@@ -68,13 +78,13 @@ class User extends Authenticatable
      * Get Avatar URL - either uploaded file or Gravatar fallback
      */
 
-    public function getAvatarUrlAttribute(): string 
+    public function getAvatarUrlAttribute(): string
     {
-        if($this->avatar) {
+        if ($this->avatar) {
             return asset('storage/' . $this->avatar);
         }
 
         // Fallback to Laravel Cloud avatar service
-         return 'https://avatars.laravel.cloud/' . urlencode($this->email);
+        return 'https://avatars.laravel.cloud/' . urlencode($this->email);
     }
 }

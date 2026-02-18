@@ -4,6 +4,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- CSRF Token for AJAX -->
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>{{ isset($title) ? $title . ' - Chirper' : 'Chirper' }}</title>
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=instrument-sans:400,500,600,700" rel="stylesheet" />
@@ -87,6 +89,113 @@
             <p>© {{ date('Y') }} Chirper - Built with Laravel and ❤️</p>
         </div>
     </footer>
+
+    <!-- Like Functionality JavaScript -->
+    <script>
+        // Get CSRF token
+        const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+
+        /**
+         * Toggle like on a chirp
+         */
+        async function toggleLike(chirpId, button) {
+            // Prevent double-clicks
+            if (button.disabled) return;
+            button.disabled = true;
+
+            try {
+                const response = await fetch(`/chirps/${chirpId}/like`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': csrfToken,
+                        'Accept': 'application/json',
+                    },
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    updateLikeButton(button, data.liked, data.likes_count);
+                    showToast(data.message, 'success');
+                } else {
+                    showToast('Something went wrong', 'error');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showToast('Failed to update like', 'error');
+            } finally {
+                button.disabled = false;
+            }
+        }
+
+        /**
+         * Update like button appearance
+         */
+        function updateLikeButton(button, liked, count) {
+            const icon = button.querySelector('.like-icon');
+            const countSpan = button.querySelector('.likes-count');
+
+            button.setAttribute('data-liked', liked ? 'true' : 'false');
+            countSpan.textContent = count;
+
+            if (liked) {
+                button.classList.remove('text-base-content/60');
+                button.classList.add('text-error');
+                icon.setAttribute('fill', 'currentColor');
+                icon.classList.add('scale-125');
+                setTimeout(() => icon.classList.remove('scale-125'), 200);
+            } else {
+                button.classList.remove('text-error');
+                button.classList.add('text-base-content/60');
+                icon.setAttribute('fill', 'none');
+            }
+        }
+
+        /**
+         * Show toast notification
+         */
+        function showToast(message, type = 'success') {
+            // Remove existing toasts
+            const existing = document.querySelector('.toast-notification');
+            if (existing) existing.remove();
+
+            const toast = document.createElement('div');
+            toast.className = `toast-notification fixed bottom-4 right-4 z-50 animate-fade-in`;
+            toast.innerHTML = `
+                <div class="alert ${type === 'success' ? 'alert-success' : 'alert-error'} shadow-lg">
+                    <span>${message}</span>
+                </div>
+            `;
+
+            document.body.appendChild(toast);
+
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transition = 'opacity 0.5s';
+                setTimeout(() => toast.remove(), 500);
+            }, 2000);
+        }
+    </script>
+
+    <!-- Add fade-in animation -->
+    <style>
+        @keyframes fade-in {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .animate-fade-in {
+            animation: fade-in 0.3s ease-out;
+        }
+    </style>
 </body>
 
 </html>

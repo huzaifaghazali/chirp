@@ -5,12 +5,18 @@ use App\Http\Controllers\Auth\Logout;
 use App\Http\Controllers\Auth\Register;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ChirpController;
+use App\Http\Controllers\LikeController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SearchController;
 
 // SEARCH ROUTE 
 Route::get('/search', SearchController::class)->name('search');
 
+// LIKE ROUTES 
+Route::middleware('auth')->group(function () {
+    Route::post('/chirps/{chirp}/like', [LikeController::class, 'toggle'])->name('chirps.like');
+    Route::get('/chirps/{chirp}/likes', [LikeController::class, 'show'])->name('chirps.likes.show');
+});
 
 // PROFILE ROUTES
 Route::get('/profile/{user}', [ProfileController::class, 'show'])->name('profile.show');
@@ -23,10 +29,10 @@ Route::middleware('auth')->group(function () {
 Route::get('/', [ChirpController::class, 'index']);
 // Protected routes: only users who are authenticated can perform CRUD
 Route::middleware('auth')->group(function () {
-   Route::post('/chirps', [ChirpController::class, 'store']);
-   Route::get('/chirps/{chirp}/edit', [ChirpController::class, 'edit']);
-   Route::put('/chirps/{chirp}', [ChirpController::class, 'update']);
-   Route::delete('/chirps/{chirp}', [ChirpController::class, 'destroy']);
+    Route::post('/chirps', [ChirpController::class, 'store']);
+    Route::get('/chirps/{chirp}/edit', [ChirpController::class, 'edit']);
+    Route::put('/chirps/{chirp}', [ChirpController::class, 'update']);
+    Route::delete('/chirps/{chirp}', [ChirpController::class, 'destroy']);
 });
 // Route::resource('chirps', ChirpController::class)
 //    ->only(['store', 'edit', 'update', 'destroy']);

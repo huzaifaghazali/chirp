@@ -43,7 +43,8 @@ class SearchController extends Controller
         // Search Chirps (message content) Paginated
         if (in_array($filter, ['all', 'chirps'])) {
             $chirps = Chirp::query()
-                ->with('user')
+                ->with(['user', 'likes'])
+                ->withCount('likes')
                 ->where('message', 'like', "%{$query}%")
                 ->latest()
                 ->paginate(10)

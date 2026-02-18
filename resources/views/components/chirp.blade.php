@@ -1,6 +1,6 @@
 @props(['chirp'])
 
-<div class="card bg-base-100">
+<div class="card bg-base-100" data-chirp-id="{{ $chirp->id }}">
     <div class="card-body">
         <div class="flex space-x-3">
             @if ($chirp->user)
@@ -9,7 +9,6 @@
                         <a href="{{ route('profile.show', $chirp->user) }}">
                             <img src="{{ $chirp->user->avatar_url }}" alt="{{ $chirp->user->name }}'s avatar"
                                 class="rounded-full hover:opacity-80 transition-opacity" />
-
                         </a>
                     </div>
                 </div>
@@ -58,7 +57,35 @@
                         </div>
                     @endcan
                 </div>
+
                 <p class="mt-1">{{ $chirp->message }}</p>
+
+                {{-- Like Button --}}
+                <div class="mt-3 flex items-center gap-4">
+                    @auth
+                        <button
+                            class="btn btn-ghost btn-xs gap-1 like-btn {{ $chirp->is_liked_by_current_user ? 'text-error' : 'text-base-content/60' }}"
+                            data-liked="{{ $chirp->is_liked_by_current_user ? 'true' : 'false' }}"
+                            onclick="toggleLike({{ $chirp->id }}, this)">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 like-icon transition-transform"
+                                fill="{{ $chirp->is_liked_by_current_user ? 'currentColor' : 'none' }}" viewBox="0 0 24 24"
+                                stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                            </svg>
+                            <span class="likes-count">{{ $chirp->likes_count }}</span>
+                        </button>
+                    @else
+                        <a href="{{ route('login') }}" class="btn btn-ghost btn-xs gap-1 text-base-content/60">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
+                                stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                            </svg>
+                            <span>{{ $chirp->likes_count }}</span>
+                        </a>
+                    @endauth
+                </div>
             </div>
         </div>
     </div>
