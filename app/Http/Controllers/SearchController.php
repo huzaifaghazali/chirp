@@ -5,9 +5,19 @@ namespace App\Http\Controllers;
 use App\Models\Chirp;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 class SearchController extends Controller
 {
+    /**
+     * Create an empty paginator instance
+     */
+
+    private function emptyPaginator(): LengthAwarePaginator
+    {
+        return new LengthAwarePaginator([], 0, 10);
+    }
+
     /**
      * Handle search requests.
      */
@@ -16,19 +26,20 @@ class SearchController extends Controller
         $query = $request->input('q');
         $filter = $request->input('filter', 'all');  // All users, chirps
 
+        // Initialize with empty paginators/collections
+        $users = collect();
+        $chirps = $this->emptyPaginator();
+
         // Require at least 2 characters to search
         if (!$query || strlen($query) < 2) {
             return view('search.results', [
                 'query' => $query,
                 'filter' => $filter,
-                'users' => collect(),
-                'chirps' => collect(),
+                'users' => $users,
+                'chirps' => $chirps,
                 'message' => 'Please enter at least 2 characters to search.',
             ]);
         }
-
-        $users = collect();
-        $chirps = collect();
 
         // Search Users (name or email)
         if (in_array($filter, ['all', 'users'])) {
@@ -56,7 +67,7 @@ class SearchController extends Controller
             'filter' => $filter,
             'users' => $users,
             'chirps' => $chirps,
-            'totalResults' => $users->count() + ($chirps instanceof \Illuminate\Pagination\LengthAwarePaginator ? $chirps->total() : $chirps->count()),
+            'totalResults' => $users->count() + $chirps->total(),
         ]);
     }
 }
