@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 class ChirpController extends Controller
 {
     use AuthorizesRequests;
+
     /**
      * Display a listing of the resource.
      */
@@ -16,6 +17,7 @@ class ChirpController extends Controller
     {
         // $chirps = Chirp::with('user')->latest()->take(50)->get();
         $chirps = Chirp::with(['user', 'likes'])->withCount('likes')->latest()->paginate(5);
+
         return view('home', ['chirps' => $chirps]);
     }
 
@@ -92,6 +94,7 @@ class ChirpController extends Controller
         // This is security check. Check that the currently logged-in user has permission to perform deleting
         $this->authorize('delete', $chirp);
         $chirp->delete();
+
         return redirect('/')->with('success', 'Chirp deleted');
     }
 }

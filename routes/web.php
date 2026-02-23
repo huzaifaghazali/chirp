@@ -1,18 +1,56 @@
 <?php
 
+use App\Http\Controllers\Admin\AdminController;
+use App\Http\Controllers\Admin\AdminLogController;
+use App\Http\Controllers\Admin\ChirpModerationController;
+use App\Http\Controllers\Admin\ReportController;
+use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Auth\Login;
 use App\Http\Controllers\Auth\Logout;
 use App\Http\Controllers\Auth\Register;
-use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ChirpController;
 use App\Http\Controllers\LikeController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SearchController;
+use Illuminate\Support\Facades\Route;
 
-// SEARCH ROUTE 
+
+
+// ADMIN ROUTES - Protected by EnsureAdmin middleware
+Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
+
+    // Dashboard
+    Route::get('/', [AdminController::class, 'dashboard'])->name('dashboard');
+
+    // User Management
+    Route::get('/users', [UserController::class, 'index'])->name('users.index');
+    Route::get('/users/{user}', [UserController::class, 'show'])->name('users.show');
+    Route::get('/users/{user}/edit', [UserController::class, 'edit'])->name('users.edit');
+    Route::put('/users/{user}', [UserController::class, 'update'])->name('users.update');
+    Route::post('/users/{user}/suspend', [UserController::class, 'suspend'])->name('users.suspend');
+    Route::post('/users/{user}/ban', [UserController::class, 'ban'])->name('users.ban');
+    Route::post('/users/{user}/activate', [UserController::class, 'activate'])->name('users.activate');
+    Route::delete('/users/{user}', [UserController::class, 'destroy'])->name('users.destroy');
+
+    // Content Moderation
+    Route::get('/chirps', [ChirpModerationController::class, 'index'])->name('chirps.index');
+    Route::get('/chirps/{chirp}', [ChirpModerationController::class, 'show'])->name('chirps.show');
+    Route::delete('/chirps/{chirp}', [ChirpModerationController::class, 'destroy'])->name('chirps.destroy');
+    Route::post('/chirps/{chirp}/dismiss', [ChirpModerationController::class, 'dismissReports'])->name('chirps.dismiss');
+
+    // Reports
+    Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
+    Route::get('/reports/{report}', [ReportController::class, 'show'])->name('reports.show');
+    Route::post('/reports/{report}/resolve', [ReportController::class, 'resolve'])->name('reports.resolve');
+
+    // Admin Logs (Audit Trail)
+    Route::get('/logs', [AdminLogController::class, 'index'])->name('logs.index');
+});
+
+// SEARCH ROUTE
 Route::get('/search', SearchController::class)->name('search');
 
-// LIKE ROUTES 
+// LIKE ROUTES
 Route::middleware('auth')->group(function () {
     Route::post('/chirps/{chirp}/like', [LikeController::class, 'toggle'])->name('chirps.like');
     Route::get('/chirps/{chirp}/likes', [LikeController::class, 'show'])->name('chirps.likes.show');
@@ -27,7 +65,7 @@ Route::middleware('auth')->group(function () {
 });
 
 // Chirp Routes
-Route::get('/', [ChirpController::class, 'index']);
+Route::get('/', [ChirpController::class, 'index'])->name('home');
 // Protected routes: only users who are authenticated can perform CRUD
 Route::middleware('auth')->group(function () {
     Route::post('/chirps', [ChirpController::class, 'store']);
@@ -41,7 +79,6 @@ Route::middleware('auth')->group(function () {
 // REGISTER ROUTES
 Route::view('/register', 'auth.register')->middleware('guest')->name('register');
 Route::post('/register', Register::class)->middleware('guest');
-
 
 // LOGIN ROUTES
 Route::view('/login', 'auth.login')->middleware('guest')->name('login');

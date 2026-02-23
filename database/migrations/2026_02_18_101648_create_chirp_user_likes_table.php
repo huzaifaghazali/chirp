@@ -16,7 +16,7 @@ return new class extends Migration
             $table->foreignId('chirp_id')->constrained()->cascadeOnDelete();
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
             $table->timestamps();
-           
+
             // Prevent duplicate likes
             $table->unique(['chirp_id', 'user_id']);
         });

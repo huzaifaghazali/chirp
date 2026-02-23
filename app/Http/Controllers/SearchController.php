@@ -12,7 +12,6 @@ class SearchController extends Controller
     /**
      * Create an empty paginator instance
      */
-
     private function emptyPaginator(): LengthAwarePaginator
     {
         return new LengthAwarePaginator([], 0, 10);
@@ -31,7 +30,7 @@ class SearchController extends Controller
         $chirps = $this->emptyPaginator();
 
         // Require at least 2 characters to search
-        if (!$query || strlen($query) < 2) {
+        if (! $query || strlen($query) < 2) {
             return view('search.results', [
                 'query' => $query,
                 'filter' => $filter,

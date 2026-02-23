@@ -25,9 +25,16 @@ class User extends Authenticatable
         'password',
         'bio',
         'avatar',
+        'is_admin',
+        'status',
+        'suspended_until',
     ];
 
-    protected $appends = ['avatar_url']; // Add this for easy access
+    protected $casts = [
+        'suspended_until' => 'datetime',
+    ];
+
+    protected $appends = ['avatar_url'];
 
     /**
      * The attributes that should be hidden for serialization.
@@ -68,7 +75,6 @@ class User extends Authenticatable
     /**
      * Get user's profile URL
      */
-
     public function profileUrl(): string
     {
         return route('profile.show', $this);
@@ -77,14 +83,24 @@ class User extends Authenticatable
     /**
      * Get Avatar URL - either uploaded file or Gravatar fallback
      */
-
     public function getAvatarUrlAttribute(): string
     {
         if ($this->avatar) {
-            return asset('storage/' . $this->avatar);
+            return asset('storage/'.$this->avatar);
         }
 
         // Fallback to Laravel Cloud avatar service
-        return 'https://avatars.laravel.cloud/' . urlencode($this->email);
+        return 'https://avatars.laravel.cloud/'.urlencode($this->email);
+    }
+
+    // Add relationships
+    public function reports()
+    {
+        return $this->hasMany(Report::class, 'reporter_id');
+    }
+
+    public function adminLogs()
+    {
+        return $this->hasMany(AdminLog::class, 'admin_id');
     }
 }

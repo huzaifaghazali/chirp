@@ -51,6 +51,7 @@ class ProfileController extends Controller
     public function edit(User $user)
     {
         $this->authorize('update', $user);
+
         return view('profile.edit', compact('user'));
     }
 
@@ -73,7 +74,7 @@ class ProfileController extends Controller
                 File::image()
                     ->min(1)
                     ->max(2048) // 2MB max
-                    ->dimensions(Rule::dimensions()->maxWidth(2000)->maxHeight(2000))
+                    ->dimensions(Rule::dimensions()->maxWidth(2000)->maxHeight(2000)),
             ],
             'remove_avatar' => 'nullable|boolean',
             'current_password' => 'required_with:password',
@@ -106,8 +107,8 @@ class ProfileController extends Controller
         $user->bio = $validated['bio'] ?? null;
 
         // Update password if provided
-        if (!empty($validated['password'])) {
-            if (!Hash::check($validated['current_password'], $user->password)) {
+        if (! empty($validated['password'])) {
+            if (! Hash::check($validated['current_password'], $user->password)) {
                 return back()->withErrors(['current_password' => 'Current password is incorrect']);
             }
             $user->password = Hash::make($validated['password']);

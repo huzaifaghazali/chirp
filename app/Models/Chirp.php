@@ -29,23 +29,23 @@ class Chirp extends Model
     {
         return $this->belongsToMany(User::class, 'chirp_user_likes')->withTimestamps();
     }
- 
+
     /**
      * Check if current user liked this chirp
      */
     public function getIsLikedByCurrentUserAttribute(): bool
     {
-        if (!auth()->check()) {
+        if (! auth()->check()) {
             return false;
         }
-        
+
         return $this->likes()->where('user_id', auth()->id())->exists();
     }
 
     /**
      * Like this chirp
      */
-    public function like(User $user): void 
+    public function like(User $user): void
     {
         $this->likes()->syncWithoutDetaching($user->id);
     }
@@ -53,7 +53,7 @@ class Chirp extends Model
     /**
      * Unlike this chirp
      */
-    public function unlike(User $user): void 
+    public function unlike(User $user): void
     {
         $this->likes()->detach($user->id);
     }
@@ -61,26 +61,30 @@ class Chirp extends Model
     /**
      * Toggle like status
      */
-
     public function toggleLike(User $user): bool
     {
         if ($this->isLikedBy($user)) {
             $this->unlike($user);
+
             return false;
         }
 
         $this->like($user);
+
         return true;
     }
 
-    
     /**
      * Check if specific user liked this chirp
      */
-
     public function isLikedBy(User $user): bool
     {
         return $this->likes()->where('user_id', $user->id)->exists();
+    }
+
+    public function reports()
+    {
+        return $this->morphMany(Report::class, 'reportable');
     }
 }
 
