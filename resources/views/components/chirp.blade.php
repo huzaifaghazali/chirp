@@ -75,6 +75,8 @@
                             </svg>
                             <span class="likes-count">{{ $chirp->likes_count }}</span>
                         </button>
+                        {{-- Add Report Button --}}
+                        <x-report-button type="chirp" :id="$chirp->id" buttonClass="btn-ghost" />
                     @else
                         <a href="{{ route('login') }}" class="btn btn-ghost btn-xs gap-1 text-base-content/60">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
@@ -83,6 +85,15 @@
                                     d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
                             </svg>
                             <span>{{ $chirp->likes_count }}</span>
+                        </a>
+                        {{-- Guest Report Link --}}
+                        <a href="{{ route('login') }}" class="btn btn-ghost btn-xs gap-1 text-base-content/60">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
+                                stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                            </svg>
+                            <span>Report</span>
                         </a>
                     @endauth
                 </div>

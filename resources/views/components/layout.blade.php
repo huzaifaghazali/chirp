@@ -64,6 +64,19 @@
                     <ul tabindex="0" class="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-52 mt-4">
                         <li><a href="{{ route('profile.show', auth()->user()) }}">Profile</a></li>
                         <li><a href="{{ route('profile.edit', auth()->user()) }}">Settings</a></li>
+                        <li>
+                            <a href="{{ route('reports.my') }}">
+                                My Reports
+                                @php
+                                    $pendingReports = \App\Models\Report::where('reporter_id', auth()->id())
+                                        ->whereIn('status', ['pending', 'under_review'])
+                                        ->count();
+                                @endphp
+                                @if ($pendingReports > 0)
+                                    <span class="badge badge-warning badge-sm">{{ $pendingReports }}</span>
+                                @endif
+                            </a>
+                        </li>
                         @if (auth()->user()->is_admin)
                             <li class="divider"></li>
                             <li>

@@ -3,7 +3,7 @@
 use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\Admin\AdminLogController;
 use App\Http\Controllers\Admin\ChirpModerationController;
-use App\Http\Controllers\Admin\ReportController;
+use App\Http\Controllers\Admin\ReportController as AdminReportController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Auth\Login;
 use App\Http\Controllers\Auth\Logout;
@@ -13,7 +13,7 @@ use App\Http\Controllers\LikeController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SearchController;
 use Illuminate\Support\Facades\Route;
-
+use App\Http\Controllers\ReportController;       
 
 
 // ADMIN ROUTES - Protected by EnsureAdmin middleware
@@ -39,9 +39,9 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::post('/chirps/{chirp}/dismiss', [ChirpModerationController::class, 'dismissReports'])->name('chirps.dismiss');
 
     // Reports
-    Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
-    Route::get('/reports/{report}', [ReportController::class, 'show'])->name('reports.show');
-    Route::post('/reports/{report}/resolve', [ReportController::class, 'resolve'])->name('reports.resolve');
+    Route::get('/reports', [AdminReportController::class, 'index'])->name('reports.index');
+    Route::get('/reports/{report}', [AdminReportController::class, 'show'])->name('reports.show');
+    Route::post('/reports/{report}/resolve', [AdminReportController::class, 'resolve'])->name('reports.resolve');
 
     // Admin Logs (Audit Trail)
     Route::get('/logs', [AdminLogController::class, 'index'])->name('logs.index');
@@ -55,6 +55,13 @@ Route::middleware('auth')->group(function () {
     Route::post('/chirps/{chirp}/like', [LikeController::class, 'toggle'])->name('chirps.like');
     Route::get('/chirps/{chirp}/likes', [LikeController::class, 'show'])->name('chirps.likes.show');
 });
+
+// User reporting routes
+Route::middleware('auth')->group(function () {
+    Route::post('/reports', [ReportController::class, 'store'])->name('reports.store');
+    Route::get('/my-reports', [ReportController::class, 'myReports'])->name('reports.my');
+});
+
 
 // PROFILE ROUTES
 Route::get('/profile/{user}', [ProfileController::class, 'show'])->name('profile.show');
