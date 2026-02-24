@@ -14,7 +14,7 @@
     <div class="card bg-base-100 mb-6">
         <div class="card-body">
             <form method="GET" action="{{ route('admin.users.index') }}" class="flex flex-wrap gap-4 items-end">
-                <div class="form-control flex-1 min-w-[200px]">
+                <div class="form-control flex-1 min-w-50">
                     <label class="label">
                         <span class="label-text">Search</span>
                     </label>

@@ -142,7 +142,7 @@
                         @endif
                     </h3>
 
-                    <div class="space-y-4 max-h-[600px] overflow-y-auto">
+                    <div class="space-y-4 max-h-150 overflow-y-auto">
                         @forelse($reports as $report)
                             <div
                                 class="border-l-4 {{ $report->status === 'pending' ? 'border-error' : ($report->status === 'resolved' ? 'border-success' : 'border-base-300') }} pl-4 py-2">

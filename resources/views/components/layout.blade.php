@@ -47,18 +47,45 @@
 
         <div class="navbar-end gap-2">
             @auth
-                <a href="{{ route('profile.show', auth()->user()) }}" class="btn btn-ghost btn-sm flex items-center gap-2">
-                    <div class="avatar">
-                        <div class="w-6 h-6 rounded-full">
-                            <img src="{{ auth()->user()->avatar_url }}" alt="Profile" />
+                {{-- Profile dropdown with Admin option --}}
+                <div class="dropdown dropdown-end">
+                    <label tabindex="0" class="btn btn-ghost btn-sm flex items-center gap-2">
+                        <div class="avatar">
+                            <div class="w-6 h-6 rounded-full">
+                                <img src="{{ auth()->user()->avatar_url }}" alt="Profile" />
+                            </div>
                         </div>
-                    </div>
-                    <span class="hidden sm:inline">{{ auth()->user()->name }}</span>
-                </a>
-                <form method="POST" action="/logout" class="inline">
-                    @csrf
-                    <button type="submit" class="btn btn-ghost btn-sm">Logout</button>
-                </form>
+                        <span class="hidden sm:inline">{{ auth()->user()->name }}</span>
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
+                            stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                        </svg>
+                    </label>
+                    <ul tabindex="0" class="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-52 mt-4">
+                        <li><a href="{{ route('profile.show', auth()->user()) }}">Profile</a></li>
+                        <li><a href="{{ route('profile.edit', auth()->user()) }}">Settings</a></li>
+                        @if (auth()->user()->is_admin)
+                            <li class="divider"></li>
+                            <li>
+                                <a href="{{ route('admin.dashboard') }}" class="text-primary font-semibold">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none"
+                                        viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                                    </svg>
+                                    Admin Panel
+                                </a>
+                            </li>
+                        @endif
+                        <li class="divider"></li>
+                        <li>
+                            <form method="POST" action="/logout" class="w-full">
+                                @csrf
+                                <button type="submit" class="w-full text-left">Logout</button>
+                            </form>
+                        </li>
+                    </ul>
+                </div>
             @else
                 <a href="/login" class="btn btn-ghost btn-sm">Sign In</a>
                 <a href="{{ route('register') }}" class="btn btn-primary btn-sm">Sign Up</a>

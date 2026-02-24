@@ -21,7 +21,7 @@
     <div class="card bg-base-100 mb-6">
         <div class="card-body">
             <form method="GET" action="{{ route('admin.chirps.index') }}" class="flex flex-wrap gap-4 items-end">
-                <div class="form-control flex-1 min-w-[300px]">
+                <div class="form-control flex-1 min-w-75">
                     <label class="label">
                         <span class="label-text">Search Chirps</span>
                     </label>

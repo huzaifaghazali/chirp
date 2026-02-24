@@ -14,9 +14,8 @@
 
                         <!-- Email -->
                         <label class="floating-label mb-6">
-                            <input type="email" name="email"
-                                placeholder="[mail@example.com](<mailto:mail@example.com>)" value="{{ old('email') }}"
-                                required autofocus
+                            <input type="email" name="email" placeholder="email@example.com"
+                                value="{{ old('email') }}" required autofocus
                                 class="input input-bordered {{ $errors->has('email') ? 'input-error' : '' }}">
                             <span>Email</span>
                         </label>
