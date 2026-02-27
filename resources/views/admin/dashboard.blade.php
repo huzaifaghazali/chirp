@@ -1,5 +1,4 @@
 @extends('admin.layout')
-
 @section('title', 'Dashboard')
 
 @section('content')
@@ -80,7 +79,8 @@
         <div class="card bg-base-100">
             <div class="card-body">
                 <h3 class="card-title">User Registrations (30 Days)</h3>
-                <canvas id="userChart" height="250"></canvas>
+                <canvas id="userChart" height="250" data-labels='{!! json_encode($userChartData->pluck('date')) !!}'
+                    data-data='{!! json_encode($userChartData->pluck('count')) !!}'></canvas>
             </div>
         </div>
 
@@ -88,7 +88,8 @@
         <div class="card bg-base-100">
             <div class="card-body">
                 <h3 class="card-title">Chirps Posted (30 Days)</h3>
-                <canvas id="chirpChart" height="250"></canvas>
+                <canvas id="chirpChart" height="250" data-labels='{!! json_encode($chirpChartData->pluck('date')) !!}'
+                    data-data='{!! json_encode($chirpChartData->pluck('count')) !!}'></canvas>
             </div>
         </div>
     </div>
@@ -180,69 +181,6 @@
     </div>
 
     <!-- Chart.js Scripts -->
-    <script>
-        // User Registration Chart
-        const userCtx = document.getElementById('userChart').getContext('2d');
-        new Chart(userCtx, {
-            type: 'line',
-            data: {
-                labels: {!! json_encode($userChartData->pluck('date')) !!},
-                datasets: [{
-                    label: 'New Users',
-                    data: {!! json_encode($userChartData->pluck('count')) !!},
-                    borderColor: '#5580d2',
-                    backgroundColor: 'rgba(85, 128, 210, 0.1)',
-                    fill: true,
-                    tension: 0.4
-                }]
-            },
-            options: {
-                responsive: true,
-                plugins: {
-                    legend: {
-                        display: false
-                    }
-                },
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        ticks: {
-                            precision: 0
-                        }
-                    }
-                }
-            }
-        });
-
-        // Chirps Chart
-        const chirpCtx = document.getElementById('chirpChart').getContext('2d');
-        new Chart(chirpCtx, {
-            type: 'bar',
-            data: {
-                labels: {!! json_encode($chirpChartData->pluck('date')) !!},
-                datasets: [{
-                    label: 'Chirps',
-                    data: {!! json_encode($chirpChartData->pluck('count')) !!},
-                    backgroundColor: '#598b6e',
-                    borderRadius: 4
-                }]
-            },
-            options: {
-                responsive: true,
-                plugins: {
-                    legend: {
-                        display: false
-                    }
-                },
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        ticks: {
-                            precision: 0
-                        }
-                    }
-                }
-            }
-        });
-    </script>
+    <script></script>
+    @vite(['resources/js/admin-dashboard.js'])
 @endsection

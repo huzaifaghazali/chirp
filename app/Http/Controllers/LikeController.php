@@ -87,7 +87,7 @@ class LikeController extends Controller
     }
 
 
-      /**
+    /**
      * Convert seconds to human-readable format.
      */
     protected function secondsToHuman(int $seconds): string

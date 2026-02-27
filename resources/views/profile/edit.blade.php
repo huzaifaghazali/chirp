@@ -153,19 +153,7 @@
     </div>
 
 
-    <!-- JavaScript for live preview -->
-
-    <script>
-        document.getElementById('avatar-input').addEventListener('change', function(e) {
-            const file = e.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    document.getElementById('avatar-preview').src = e.target.result;
-
-                };
-                reader.readAsDataURL(file);
-            }
-        });
-    </script>
+    {{-- <!-- JavaScript for live image preview -->
+    <script></script> --}}
+    @vite(['resources/js/profile-edit.js'])
 </x-layout>
