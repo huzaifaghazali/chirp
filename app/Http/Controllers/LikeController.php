@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Chirp;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\RateLimiter;
 
 class LikeController extends Controller
 {
@@ -39,14 +40,38 @@ class LikeController extends Controller
     {
         $user = $request->user();
 
+        // Check rate limit manually for immediate feedback
+        $key = "likes:" . $user->id . ":" . $request->ip();
+
+        if (RateLimiter::tooManyAttempts($key, 30)) {
+            $seconds = RateLimiter::availableIn($key);
+
+            return response()->json([
+                'success' => false,
+                'message' => __("ratelimit.likes", [
+                    'time' => $this->secondsToHuman($seconds),
+                    'seconds' => $seconds,
+                ]),
+                'retry_after' => $seconds,
+                'rate_limited' => true,
+            ], 429);
+        }
+
         $isLiked = $chirp->toggleLike($user);
         $likesCount = $chirp->likes()->count();
+
+        // Add rate limit info to successful response
+        $remaining = 30 - RateLimiter::attempts($key);
 
         return response()->json([
             'success' => true,
             'liked' => $isLiked,
             'likes_count' => $likesCount,
             'message' => $isLiked ? 'Chirp liked!' : 'Chirp unliked!',
+             'rate_limit' => [
+                'remaining' => max(0, $remaining),
+                'limit' => 30,
+            ],
         ]);
     }
 
@@ -59,6 +84,26 @@ class LikeController extends Controller
             'likes_count' => $chirp->likes()->count(),
             'is_liked_by_current_user' => auth()->check() ? $chirp->isLikedBy(auth()->user()) : false,
         ]);
+    }
+
+
+      /**
+     * Convert seconds to human-readable format.
+     */
+    protected function secondsToHuman(int $seconds): string
+    {
+        if ($seconds < 60) {
+            return $seconds . ' second' . ($seconds !== 1 ? 's' : '');
+        }
+        
+        $minutes = ceil($seconds / 60);
+        
+        if ($minutes < 60) {
+            return $minutes . ' minute' . ($minutes !== 1 ? 's' : '');
+        }
+        
+        $hours = ceil($minutes / 60);
+        return $hours . ' hour' . ($hours !== 1 ? 's' : '');
     }
 
     /**

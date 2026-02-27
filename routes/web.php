@@ -11,12 +11,15 @@ use App\Http\Controllers\Auth\Register;
 use App\Http\Controllers\ChirpController;
 use App\Http\Controllers\LikeController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\ReportController;
 use App\Http\Controllers\SearchController;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\ReportController;       
 
-
-// ADMIN ROUTES - Protected by EnsureAdmin middleware
+/*
+|--------------------------------------------------------------------------
+| Admin Routes (Protected by EnsureAdmin middleware)
+|--------------------------------------------------------------------------
+*/
 Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
 
     // Dashboard
@@ -47,23 +50,40 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::get('/logs', [AdminLogController::class, 'index'])->name('logs.index');
 });
 
-// SEARCH ROUTE
-Route::get('/search', SearchController::class)->name('search');
+/*
+|--------------------------------------------------------------------------
+| Search Routes (Rate Limited)
+|--------------------------------------------------------------------------
+*/
+Route::get('/search', SearchController::class)
+    ->name('search')
+    ->middleware('throttle:searches');
 
-// LIKE ROUTES
-Route::middleware('auth')->group(function () {
+/*
+|--------------------------------------------------------------------------
+| Like Routes (Rate Limited)
+|--------------------------------------------------------------------------
+*/
+Route::middleware(['auth', 'throttle:likes'])->group(function () {
     Route::post('/chirps/{chirp}/like', [LikeController::class, 'toggle'])->name('chirps.like');
     Route::get('/chirps/{chirp}/likes', [LikeController::class, 'show'])->name('chirps.likes.show');
 });
 
-// User reporting routes
-Route::middleware('auth')->group(function () {
+/*
+|--------------------------------------------------------------------------
+| Report Routes (Rate Limited)
+|--------------------------------------------------------------------------
+*/
+Route::middleware(['auth', 'throttle:reports'])->group(function () {
     Route::post('/reports', [ReportController::class, 'store'])->name('reports.store');
     Route::get('/my-reports', [ReportController::class, 'myReports'])->name('reports.my');
 });
 
-
-// PROFILE ROUTES
+/*
+|--------------------------------------------------------------------------
+| Profile Routes
+|--------------------------------------------------------------------------
+*/
 Route::get('/profile/{user}', [ProfileController::class, 'show'])->name('profile.show');
 Route::get('/profile/{user}/likes', [ProfileController::class, 'likes'])->name('profile.likes');
 Route::middleware('auth')->group(function () {
@@ -71,11 +91,15 @@ Route::middleware('auth')->group(function () {
     Route::put('/profile/{user}', [ProfileController::class, 'update'])->name('profile.update');
 });
 
-// Chirp Routes
+/*
+|--------------------------------------------------------------------------
+| Chirp Routes (Rate Limited for creation)
+|--------------------------------------------------------------------------
+*/
 Route::get('/', [ChirpController::class, 'index'])->name('home');
 // Protected routes: only users who are authenticated can perform CRUD
 Route::middleware('auth')->group(function () {
-    Route::post('/chirps', [ChirpController::class, 'store']);
+    Route::post('/chirps', [ChirpController::class, 'store'])->middleware('throttle:chirps');
     Route::get('/chirps/{chirp}/edit', [ChirpController::class, 'edit']);
     Route::put('/chirps/{chirp}', [ChirpController::class, 'update']);
     Route::delete('/chirps/{chirp}', [ChirpController::class, 'destroy']);
@@ -83,13 +107,15 @@ Route::middleware('auth')->group(function () {
 // Route::resource('chirps', ChirpController::class)
 //    ->only(['store', 'edit', 'update', 'destroy']);
 
-// REGISTER ROUTES
+/*
+|--------------------------------------------------------------------------
+| Authentication Routes
+|--------------------------------------------------------------------------
+*/
 Route::view('/register', 'auth.register')->middleware('guest')->name('register');
 Route::post('/register', Register::class)->middleware('guest');
 
-// LOGIN ROUTES
 Route::view('/login', 'auth.login')->middleware('guest')->name('login');
 Route::post('/login', Login::class)->middleware('guest');
 
-// LOGOUT ROUTE
 Route::post('/logout', Logout::class)->middleware('auth');

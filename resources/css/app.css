@@ -338,3 +338,19 @@ h6 {
 .btn-disabled {
     @apply opacity-50 cursor-not-allowed;
 }
+
+/* Toast warning color */
+:where(.toast) {
+    --color-success: #598b6e;
+    --color-success-content: #ffffff;
+    --color-error: #dc2626;
+    --color-error-content: #ffffff;
+    --color-warning: #d97706;
+    --color-warning-content: #ffffff;
+}
+
+:where(.toast .alert-warning) {
+    background: var(--color-warning);
+    color: var(--color-warning-content);
+    border: var(--border) solid rgba(0, 0, 0, 0.08);
+}

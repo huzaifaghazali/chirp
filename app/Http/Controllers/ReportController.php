@@ -6,11 +6,9 @@ use App\Models\Chirp;
 use App\Models\Report;
 use App\Models\User;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 
 class ReportController extends Controller
 {
-  
     /**
      * Store a new report from authenticated user
      */
@@ -24,12 +22,12 @@ class ReportController extends Controller
         ]);
 
         // Determine the model being reported
-        $reportable = match($validated['type']) {
+        $reportable = match ($validated['type']) {
             'chirp' => Chirp::find($validated['id']),
             'user' => User::find($validated['id']),
         };
 
-        if (!$reportable) {
+        if (! $reportable) {
             return back()->with('error', 'The content you are trying to report no longer exists.');
         }
 

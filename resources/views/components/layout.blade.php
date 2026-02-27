@@ -136,7 +136,7 @@
         const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
 
         /**
-         * Toggle like on a chirp
+         * Toggle like on a chirp with rate limit handling
          */
         async function toggleLike(chirpId, button) {
             // Prevent double-clicks
@@ -155,11 +155,29 @@
 
                 const data = await response.json();
 
+                if (response.status === 429) {
+                    // Rate limited - show specific message with countdown
+                    showToast(data.message || 'Too many likes. Please slow down.', 'warning');
+
+                    // Optionally disable button temporarily
+                    if (data.retry_after) {
+                        setTimeout(() => {
+                            button.disabled = false;
+                        }, Math.min(data.retry_after * 1000, 30000)); // Max 30s client-side
+                    }
+                    return;
+                }
+
                 if (data.success) {
                     updateLikeButton(button, data.liked, data.likes_count);
                     showToast(data.message, 'success');
+
+                    // Update rate limit indicator if present
+                    if (data.rate_limit) {
+                        console.log(`Rate limit: ${data.rate_limit.remaining}/${data.rate_limit.limit} remaining`);
+                    }
                 } else {
-                    showToast('Something went wrong', 'error');
+                    showToast(data.message || 'Something went wrong', 'error');
                 }
             } catch (error) {
                 console.error('Error:', error);
@@ -193,7 +211,7 @@
         }
 
         /**
-         * Show toast notification
+         * Enhanced toast with warning type
          */
         function showToast(message, type = 'success') {
             // Remove existing toasts
@@ -202,6 +220,13 @@
 
             const toast = document.createElement('div');
             toast.className = `toast-notification fixed bottom-4 right-4 z-50 animate-fade-in`;
+
+            const alertClass = {
+                'success': 'alert-success',
+                'error': 'alert-error',
+                'warning': 'alert-warning',
+            } [type] || 'alert-info';
+
             toast.innerHTML = `
                 <div class="alert ${type === 'success' ? 'alert-success' : 'alert-error'} shadow-lg">
                     <span>${message}</span>
@@ -214,7 +239,7 @@
                 toast.style.opacity = '0';
                 toast.style.transition = 'opacity 0.5s';
                 setTimeout(() => toast.remove(), 500);
-            }, 2000);
+            }, 3000);
         }
     </script>
 
