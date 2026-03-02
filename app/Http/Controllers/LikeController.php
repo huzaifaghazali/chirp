@@ -41,14 +41,14 @@ class LikeController extends Controller
         $user = $request->user();
 
         // Check rate limit manually for immediate feedback
-        $key = "likes:" . $user->id . ":" . $request->ip();
+        $key = 'likes:'.$user->id.':'.$request->ip();
 
         if (RateLimiter::tooManyAttempts($key, 30)) {
             $seconds = RateLimiter::availableIn($key);
 
             return response()->json([
                 'success' => false,
-                'message' => __("ratelimit.likes", [
+                'message' => __('ratelimit.likes', [
                     'time' => $this->secondsToHuman($seconds),
                     'seconds' => $seconds,
                 ]),
@@ -68,7 +68,7 @@ class LikeController extends Controller
             'liked' => $isLiked,
             'likes_count' => $likesCount,
             'message' => $isLiked ? 'Chirp liked!' : 'Chirp unliked!',
-             'rate_limit' => [
+            'rate_limit' => [
                 'remaining' => max(0, $remaining),
                 'limit' => 30,
             ],
@@ -86,24 +86,24 @@ class LikeController extends Controller
         ]);
     }
 
-
     /**
      * Convert seconds to human-readable format.
      */
     protected function secondsToHuman(int $seconds): string
     {
         if ($seconds < 60) {
-            return $seconds . ' second' . ($seconds !== 1 ? 's' : '');
+            return $seconds.' second'.($seconds !== 1 ? 's' : '');
         }
-        
+
         $minutes = ceil($seconds / 60);
-        
+
         if ($minutes < 60) {
-            return $minutes . ' minute' . ($minutes !== 1 ? 's' : '');
+            return $minutes.' minute'.($minutes !== 1 ? 's' : '');
         }
-        
+
         $hours = ceil($minutes / 60);
-        return $hours . ' hour' . ($hours !== 1 ? 's' : '');
+
+        return $hours.' hour'.($hours !== 1 ? 's' : '');
     }
 
     /**
